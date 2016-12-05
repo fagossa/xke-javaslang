@@ -4,7 +4,7 @@ public interface FilmRepository {
 
     void add(Film film);
 
-    void update(Film film);
+    Film update(Film film);
 
     Film get(String id);
 

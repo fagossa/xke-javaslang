@@ -16,7 +16,11 @@ public class FilmService {
 
     public void addFilm(Film film) {
         try {
-        filmRepository.add(film);
+            if(filmRepository.get(film.getId())==null) {
+                filmRepository.add(film);
+            } else {
+                logger.warn("Film with id {} already exist!", film.getId());
+            }
         } catch (Exception ex) {
             logger.error("Error persisting film", ex);
         }
