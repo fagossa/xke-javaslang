@@ -28,7 +28,7 @@ public class FilmValidation {
     }
 
     private Validation<String, Film> validRate(Film film) {
-        return film.getRate() < 1 && film.getRate() > 5
+        return film.getRate() < 1 || film.getRate() > 5
                 ? Validation.invalid("invalid rate")
                 : Validation.valid(film);
     }

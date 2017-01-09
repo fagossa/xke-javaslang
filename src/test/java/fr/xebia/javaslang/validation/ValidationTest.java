@@ -23,6 +23,6 @@ public class ValidationTest {
         // then
         final Validation<List<String>, Film> validation = filmValidation.validate();
         assertTrue(validation.isInvalid());
-        assertThat(validation.getError()).hasSize(1);
+        assertThat(validation.getError()).hasSize(2);
     }
 }
