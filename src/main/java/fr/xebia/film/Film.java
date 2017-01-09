@@ -10,7 +10,7 @@ public class Film {
     private String id;
     private String name;
 
-    private Integer rate;
+    private int rate;
 
     private List<Participant> people = new ArrayList<>();
 
@@ -37,7 +37,7 @@ public class Film {
         return name;
     }
 
-    public Integer getRate() {
+    public int getRate() {
         return rate;
     }
 

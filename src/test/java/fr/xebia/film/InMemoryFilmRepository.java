@@ -11,8 +11,9 @@ public class InMemoryFilmRepository implements FilmRepository {
         films.put(film.getId(), film);
     }
 
-    public void update(Film film) {
+    public Film update(Film film) {
         films.putIfAbsent(film.getId(), film);
+        return film;
     }
 
     public Film get(String id) {
