@@ -18,7 +18,7 @@ public class FilmValidation {
                 .combine(this::validName)
                 .combine(this::validRate)
                 .combine(this::atLeastOneParticipant)
-                .fold(film);
+                .apply(film);
     }
 
     private Validation<String, Film> atLeastOneParticipant(Film film) {
