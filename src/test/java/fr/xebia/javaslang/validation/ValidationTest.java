@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ValidationTest {
 
     @Test
-    public void should_detect_films_no_participants() {
+    public void should_detect_films_no_participants_and_bad_rate() {
         // given
         Film aFilm = new Film(UUID.randomUUID().toString(), "Red Dragon");
 
@@ -23,6 +23,6 @@ public class ValidationTest {
         // then
         final Validation<List<String>, Film> validation = filmValidation.validate();
         assertTrue(validation.isInvalid());
-        assertThat(validation.getError()).hasSize(2);
+        assertThat(validation.getError()).hasSize(2).containsOnly("No participants", "invalid rate");
     }
 }

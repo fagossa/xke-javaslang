@@ -10,6 +10,9 @@ public class Person {
 
     private String bio;
 
+    public Person() {
+    }
+
     public Person(String name, LocalDateTime birthday, String bio) {
         this.name = name;
         this.birthday = birthday;
