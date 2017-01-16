@@ -1,6 +1,8 @@
 package fr.xebia.javaslang.trymonad;
 
 import fr.xebia.film.Film;
+import fr.xebia.film.FilmRepository;
+import fr.xebia.film.FilmRepositoryWithTry;
 import javaslang.control.Try;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -12,10 +14,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
 import java.util.function.Consumer;
+import java.util.stream.IntStream;
 
 public class FilmExport {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    // TODO: add FilmRepositoryWithTry in the constructor
 
     public void export(Film ... films) {
         final Workbook workbook = new HSSFWorkbook();
