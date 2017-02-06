@@ -1,6 +1,8 @@
 package fr.xebia.javaslang.trymonad;
 
 import fr.xebia.film.Film;
+import fr.xebia.film.FilmRepository;
+import fr.xebia.film.Participant;
 import javaslang.control.Try;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -11,13 +13,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static fr.xebia.film.Role.DIRECTOR;
 
 public class FilmExport {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    public void export(Film ... films) {
+    public void export(Film... films) {
         final Workbook workbook = new HSSFWorkbook();
         Sheet sheet = workbook.createSheet();
 
@@ -58,6 +67,34 @@ public class FilmExport {
                     .onFailure(error -> logger.error("error when create xls", error));
             Try.run(fileOutputStream::close);
         };
+    }
+
+    private List<Participant> getDirectorsTry(FilmRepository filmRepository, String... isbns) {
+        return Stream.of(isbns)
+                .filter(n -> !n.isEmpty())
+                .map(isbn -> Try.of(() -> filmRepository.get(isbn)))
+                .map(maybeFilm -> maybeFilm
+                        .map(Film::getPeople))
+                .map(maybeFilm -> maybeFilm
+                        .getOrElse(Collections.emptyList()))
+                .flatMap(List::stream)
+                .filter(p -> p.getRole().equals(DIRECTOR))
+                .collect(Collectors.toList());
+    }
+
+    private List<Participant> getDirectors(FilmRepository filmRepository, String... isbns) {
+        List<String> collect = Stream.of(isbns)
+                .filter(n -> !n.isEmpty())
+                .collect(Collectors.toList());
+        return collect.stream()
+                .map(isbn -> Try.of(() -> filmRepository.get(isbn)))
+                .map(maybeFilm -> maybeFilm
+                        .map(Film::getPeople))
+                .map(maybeFilm -> maybeFilm
+                        .getOrElse(Collections.emptyList()))
+                .flatMap(List::stream)
+                .filter(p -> p.getRole().equals(DIRECTOR))
+                .collect(Collectors.toList());
     }
 
 }
