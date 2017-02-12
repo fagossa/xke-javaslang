@@ -5,6 +5,7 @@ import java.util.Objects;
 public class Participant {
     private Person person;
     private Role role;
+    private float bonus = 0;
 
     public Participant(Person person, Role role) {
         this.person = person;
@@ -17,6 +18,15 @@ public class Participant {
 
     public Role getRole() {
         return role;
+    }
+
+    public float getBonus() {
+        return bonus;
+    }
+
+    public Participant setBonus(float bonus) {
+        this.bonus = bonus;
+        return this;
     }
 
     @Override
