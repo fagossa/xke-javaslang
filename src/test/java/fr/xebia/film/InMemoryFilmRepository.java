@@ -16,7 +16,7 @@ public class InMemoryFilmRepository implements FilmRepository {
         return film;
     }
 
-    public Film get(String id) {
+    public Film get(String id) throws Exception {
         return films.get(id);
     }
 

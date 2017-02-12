@@ -13,14 +13,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileOutputStream;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static fr.xebia.film.Role.DIRECTOR;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 public class FilmExport {
 
@@ -69,32 +70,33 @@ public class FilmExport {
         };
     }
 
-    private List<Participant> getDirectorsTry(FilmRepository filmRepository, String... isbns) {
+    public List<Participant> getDirectorsTry(FilmRepository filmRepository, String... isbns) {
         return Stream.of(isbns)
                 .filter(n -> !n.isEmpty())
                 .map(isbn -> Try.of(() -> filmRepository.get(isbn)))
-                .map(maybeFilm -> maybeFilm
-                        .map(Film::getPeople))
-                .map(maybeFilm -> maybeFilm
-                        .getOrElse(Collections.emptyList()))
+                .map(maybeFilm -> maybeFilm.map(Film::getPeople))
+                .map(maybeFilm -> maybeFilm.getOrElse(emptyList()))
                 .flatMap(List::stream)
                 .filter(p -> p.getRole().equals(DIRECTOR))
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
-    private List<Participant> getDirectors(FilmRepository filmRepository, String... isbns) {
-        List<String> collect = Stream.of(isbns)
+    public List<Participant> getDirectors(FilmRepository filmRepository, String... isbns) {
+        List<String> booksIsbn = Stream.of(isbns)
                 .filter(n -> !n.isEmpty())
-                .collect(Collectors.toList());
-        return collect.stream()
-                .map(isbn -> Try.of(() -> filmRepository.get(isbn)))
-                .map(maybeFilm -> maybeFilm
-                        .map(Film::getPeople))
-                .map(maybeFilm -> maybeFilm
-                        .getOrElse(Collections.emptyList()))
-                .flatMap(List::stream)
-                .filter(p -> p.getRole().equals(DIRECTOR))
-                .collect(Collectors.toList());
+                .collect(toList());
+        List<Participant> directors = new ArrayList<>();
+        for (String isbn : booksIsbn) {
+            try {
+                Film film = filmRepository.get(isbn);
+                directors.addAll(film.getPeople().stream()
+                        .filter(p -> p.getRole().equals(DIRECTOR))
+                        .collect(toList()));
+            } catch (Exception e) {
+                logger.error("error when find book by isbn ", e);
+            }
+        }
+        return directors;
     }
 
 }

@@ -16,7 +16,7 @@ public class OptionalFilmService {
         this.filmRepository = filmRepository;
     }
 
-    public Option<Film> addFilm(Film film) {
+    public Option<Film> addFilm(Film film) throws Exception {
         final Option<Film> maybeFilm = Option.of(filmRepository.get(film.getId()));
         if(maybeFilm.isEmpty()) {
             filmRepository.add(film);
@@ -26,7 +26,7 @@ public class OptionalFilmService {
         }
     }
 
-    public Option<Film> updateFilm(String id, Film that) {
+    public Option<Film> updateFilm(String id, Film that) throws Exception {
         return Option
                 .of(filmRepository.get(id))
                 .map(f -> f.setRate(that.getRate()))

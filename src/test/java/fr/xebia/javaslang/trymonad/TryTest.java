@@ -1,23 +1,26 @@
 package fr.xebia.javaslang.trymonad;
 
-import fr.xebia.film.Film;
-import fr.xebia.film.Participant;
-import fr.xebia.film.Person;
-import fr.xebia.film.Role;
-import org.apache.poi.hssf.usermodel.HSSFCell;
+import fr.xebia.film.*;
+import javaslang.collection.Stream;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 
-import static fr.xebia.film.Role.*;
+import static fr.xebia.film.Role.ACTOR;
+import static fr.xebia.film.Role.DIRECTOR;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TryTest {
 
     private FilmExport filmExport = new FilmExport();
@@ -65,8 +68,57 @@ public class TryTest {
 
         // When
         filmExport.export(firstFilm, secondFilm);
-
-
     }
 
+
+    @Test
+    public void should_find_all_movies_director_javaslang_version() throws Exception {
+        //given
+        FilmRepository filmRepository = Mockito.mock(FilmRepository.class);
+        String[] isbns = {"1", "4", "5", "8", "9"};
+        mockFindMovies(filmRepository, isbns);
+
+        //when
+        List<Participant> directors = filmExport.getDirectorsTry(filmRepository, isbns);
+
+        //then
+        directors.forEach(System.out::println);
+        assertThat(directors).hasSize(5);
+        assertThat(directors).extracting(Participant::getRole).containsOnly(Role.DIRECTOR);
+        assertThat(directors).extracting(Participant::getPerson)
+                .extracting(Person::getName)
+                .containsExactly(Stream.of(isbns)
+                        .map(s -> "director" + s)
+                        .toJavaArray(String.class));
+    }
+
+    @Test
+    public void should_find_all_movies_director_java8_version() throws Exception {
+        //given
+        FilmRepository filmRepository = Mockito.mock(FilmRepository.class);
+        String[] isbns = {"1", "4", "5", "8", "9"};
+        mockFindMovies(filmRepository, isbns);
+
+        //when
+        List<Participant> directors = filmExport.getDirectors(filmRepository, isbns);
+
+        //then
+        directors.forEach(System.out::println);
+        assertThat(directors).hasSize(5);
+        assertThat(directors).extracting(Participant::getRole).containsOnly(Role.DIRECTOR);
+        assertThat(directors).extracting(Participant::getPerson)
+                .extracting(Person::getName)
+                .containsExactly(java.util.stream.Stream.of(isbns)
+                        .map(s -> "director" + s)
+                        .toArray(String[]::new));
+    }
+
+    private void mockFindMovies(FilmRepository filmRepository, String[] isbns) throws Exception {
+        for (String isbn : isbns) {
+            when(filmRepository.get(isbn)).thenReturn(new Film("movie" + isbn, "start trek")
+                    .setRate(3)
+                    .addParticipant(new Participant(new Person("actor" + isbn, LocalDateTime.now(), ""), ACTOR))
+                    .addParticipant(new Participant(new Person("director" + isbn, LocalDateTime.now(), ""), DIRECTOR)));
+        }
+    }
 }

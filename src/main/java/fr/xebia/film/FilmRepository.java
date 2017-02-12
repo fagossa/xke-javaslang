@@ -6,6 +6,6 @@ public interface FilmRepository {
 
     Film update(Film film);
 
-    Film get(String id);
+    Film get(String id) throws Exception;
 
 }
